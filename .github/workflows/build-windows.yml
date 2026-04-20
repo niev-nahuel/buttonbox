@@ -1,0 +1,44 @@
+name: Build Windows Executable
+
+on:
+  push:
+    tags:
+      - 'v*'          # dispara en v1.0.0, v1.2.3, etc.
+  workflow_dispatch:  # permite correrlo manualmente desde la web de GitHub
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: |
+          pip install pyinstaller
+          pip install .
+
+      - name: Compilar ejecutable
+        run: pyinstaller buttonbox.spec
+
+      - name: Subir ejecutable como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: ButtonBox-Windows
+          path: dist/ButtonBox.exe
+
+      # Si corrió desde un tag, también crea un Release de GitHub automáticamente
+      - name: Crear GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/ButtonBox.exe
+          name: ButtonBox ${{ github.ref_name }}
+          draft: false
+          prerelease: false
