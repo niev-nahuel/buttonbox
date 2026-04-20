@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ['buttonbox/gui/__main__.py'],
+    ['run_gui.py'], 
     pathex=[],
     binaries=[],
     datas=[
